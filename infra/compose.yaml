@@ -1,0 +1,81 @@
+version: "3.9"
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: timescale/timescaledb:2.14-pg15
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: larptech
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+
+  listener:
+    build:
+      context: ../apps/listener
+    depends_on:
+      - kafka
+
+  metadata:
+    build:
+      context: ../apps/metadata
+    depends_on:
+      - kafka
+
+  crawler:
+    build:
+      context: ../apps/crawler
+    depends_on:
+      - kafka
+
+  tester:
+    build:
+      context: ../apps/tester
+    depends_on:
+      - api
+
+  scorer:
+    build:
+      context: ../apps/scorer
+    depends_on:
+      - redis
+      - kafka
+
+  api:
+    build:
+      context: ../apps/api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis 
