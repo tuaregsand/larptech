@@ -1,4 +1,4 @@
-use futures_util::{SinkExt, StreamExt};
+use futures_util::SinkExt;
 use listener::{
     kafka::KafkaProducer,
     parser::{parse, LaunchpadMap},
@@ -46,7 +46,12 @@ async fn test_mint_event_roundtrip() {
 
 #[tokio::test]
 async fn test_end_to_end_publish_latency() {
-    if Command::new("docker").output().is_err() {
+    let docker_ok = Command::new("docker")
+        .arg("info")
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false);
+    if !docker_ok {
         eprintln!("Docker not available; skipping end-to-end test");
         return;
     }
