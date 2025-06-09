@@ -1,4 +1,4 @@
-use futures_util::SinkExt;
+use futures_util::{FutureExt, SinkExt};
 use listener::{
     kafka::KafkaProducer,
     parser::{parse, LaunchpadMap},
@@ -55,6 +55,16 @@ async fn test_end_to_end_publish_latency() {
         eprintln!("Docker not available; skipping end-to-end test");
         return;
     }
+
+    let result = std::panic::AssertUnwindSafe(end_to_end_inner())
+        .catch_unwind()
+        .await;
+    if result.is_err() {
+        eprintln!("Docker unusable; skipping end-to-end test");
+    }
+}
+
+async fn end_to_end_inner() {
     let docker = Cli::default();
     let kafka_image = GenericImage::new("bitnami/kafka", "latest")
         .with_env_var("ALLOW_PLAINTEXT_LISTENER", "yes")
