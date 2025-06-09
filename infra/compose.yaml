@@ -42,7 +42,8 @@ services:
 
   listener:
     build:
-      context: ../apps/listener
+      context: ..
+      dockerfile: apps/listener/Dockerfile
     environment:
       - HELIUS_WS=${HELIUS_WS}
       - KAFKA_BROKERS=kafka:29092
