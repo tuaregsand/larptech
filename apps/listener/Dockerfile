@@ -1,4 +1,7 @@
-FROM rust:1.78-slim as builder
+FROM rust:1.78-slim AS builder
+RUN apt-get update && \
+    apt-get install -y musl-tools protobuf-compiler && \
+    rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY libs ./libs
 COPY apps/listener ./apps/listener
