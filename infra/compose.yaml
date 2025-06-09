@@ -43,6 +43,9 @@ services:
   listener:
     build:
       context: ../apps/listener
+    environment:
+      - HELIUS_WS=${HELIUS_WS}
+      - KAFKA_BROKERS=kafka:29092
     depends_on:
       - kafka
 
