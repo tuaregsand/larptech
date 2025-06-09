@@ -57,7 +57,7 @@ harness = false
 version = "1.2.0"
 
 [dependencies.idna]
-version = "0.4.0"
+version = "1.0.3"
 
 [dependencies.percent-encoding]
 version = "2.3.0"
