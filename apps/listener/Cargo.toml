@@ -18,6 +18,12 @@ tracing-subscriber = { version = "0.3", features = ["fmt", "json"] }
 prometheus_exporter = "0.8"
 async-stream = "0.3"
 thiserror = "1"
+url = "2.4.0"
+idna = "0.4.0"
+
+[patch.crates-io]
+url = { path = "../../libs/patches/url-2.4.0/url-2.4.0" }
+idna = { path = "../../libs/patches/idna-0.4.0/idna-0.4.0" }
 
 [build-dependencies]
 prost-build = "0.12"
