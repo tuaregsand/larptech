@@ -1,0 +1,29 @@
+name: listener-ci
+
+on:
+  push:
+    paths:
+      - 'apps/listener/**'
+      - '.github/workflows/listener-ci.yaml'
+  pull_request:
+    paths:
+      - 'apps/listener/**'
+      - '.github/workflows/listener-ci.yaml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain: [stable, nightly]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          override: true
+      - uses: Swatinem/rust-cache@v2
+      - name: Install protoc
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+      - name: Run tests
+        run: cargo test --manifest-path apps/listener/Cargo.toml
